@@ -41,3 +41,11 @@ async def predict(data: dict[str, Any]):
 @app.get("/health")
 def health():
     return {"status": "ok", "model_loaded": model is not None}
+
+@app.post("/predict_batch")
+async def predict_batch(data: list[dict[str, Any]]):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded yet")
+    df = pd.DataFrame(data)
+    preds = model.predict(df)
+    return {"predictions": preds.tolist()}
